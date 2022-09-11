@@ -1,4 +1,4 @@
-# Desafio Desenvolvedor Front-end - EQI Investimentos
+# Desafio Front-end
 
 ### Screenshot
 
