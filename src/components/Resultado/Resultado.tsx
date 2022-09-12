@@ -5,11 +5,14 @@ import "tippy.js/dist/tippy.css";
 
 export default function Resultado(props: { resultData: any }) {
 	const { resultData } = props;
-	const [initialValueWithContribution, setInitialValueWithContribution] = useState(0);
-	const [finalValueWithContribution, setFinalValueWithContribution] = useState(0);
+	const [initialValueWithContribution, setInitialValueWithContribution] =
+		useState<number>(0);
+	const [finalValueWithContribution, setFinalValueWithContribution] =
+		useState<number>(0);
 	const [initialValueWithoutContribution, setInitialValueWithoutContribution] =
-		useState(0);
-	const [finalValueWithoutContribution, setFinalValueWithoutContribution] = useState(0);
+		useState<number>(0);
+	const [finalValueWithoutContribution, setFinalValueWithoutContribution] =
+		useState<number>(0);
 
 	useEffect(() => {
 		if (resultData?.data?.length > 0) {

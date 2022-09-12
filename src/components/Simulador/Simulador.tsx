@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { TIndicadores } from "../../types/dataType";
+import { TIndicadores, TInputValues } from "../../types/dataType";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -8,6 +8,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 export default function Simulador(props: { setResultData: any }) {
 	const { setResultData } = props;
 	const [indicadores, setIndicadores] = useState<TIndicadores[]>([]);
+	const [rendimento, setRendimento] = useState<String>("bruto");
+	const [indexacao, setIndexacao] = useState<String>("pre");
 
 	async function getData() {
 		const data = await axios.get("http://localhost:3000/indicadores");
@@ -32,9 +34,9 @@ export default function Simulador(props: { setResultData: any }) {
 		handleSubmit,
 		formState: { errors },
 		reset,
-	} = useForm({ resolver: yupResolver(simulatorSchema) });
+	} = useForm<TInputValues>({ resolver: yupResolver(simulatorSchema) });
 
-	const handleSimulationSubmit = async (values: any) => {
+	const handleSimulationSubmit = async (values: TInputValues): Promise<void> => {
 		const { indexationTypes, rental } = values;
 
 		const data = await axios.get(
@@ -46,6 +48,8 @@ export default function Simulador(props: { setResultData: any }) {
 
 	const resetFields = () => {
 		reset();
+		setRendimento("bruto");
+		setIndexacao("pre");
 	};
 
 	return (
@@ -66,18 +70,20 @@ export default function Simulador(props: { setResultData: any }) {
 									type="radio"
 									id="bruto"
 									className="hidden peer"
-									// name="1"
 									value="bruto"
-									defaultChecked
 									{...register("rental")}
+									onClick={() => setRendimento("bruto")}
+									defaultChecked
 								/>
 								<label
 									htmlFor="bruto"
-									className="peer-checked:bg-[#ED8E53] peer-checked:text-white w-full h-full cursor-pointer px-[5px] py-4 border-black border-r-[1px] flex text-sm">
+									className="peer-checked:bg-[#ED8E53] peer-checked:text-white w-full h-full cursor-pointer px-[5px] py-4 border-black border-r-[1px] flex text-sm hover:bg-[#eecdb9]">
 									<img
 										src="/check.svg"
 										alt="check icon"
-										className="w-5 -ml-1 hidden sm:block"
+										className={`w-5 ${
+											rendimento === "bruto" ? "block" : "hidden"
+										}`}
 									/>
 									Bruto
 								</label>
@@ -87,17 +93,19 @@ export default function Simulador(props: { setResultData: any }) {
 									type="radio"
 									id="liquido"
 									className="hidden peer"
-									// name="1"
 									value="liquido"
 									{...register("rental")}
+									onClick={() => setRendimento("liquido")}
 								/>
 								<label
 									htmlFor="liquido"
-									className="peer-checked:bg-[#ED8E53] peer-checked:text-white cursor-pointer px-[5px] py-4 flex text-sm">
+									className="peer-checked:bg-[#ED8E53] peer-checked:text-white cursor-pointer px-[5px] py-4 flex text-sm hover:bg-[#eecdb9]">
 									<img
 										src="/check.svg"
 										alt="check icon"
-										className="w-5 -ml-1 hidden sm:block"
+										className={`w-5 ${
+											rendimento === "liquido" ? "block" : "hidden"
+										}`}
 									/>
 									Liquído
 								</label>
@@ -106,8 +114,9 @@ export default function Simulador(props: { setResultData: any }) {
 
 						<label
 							htmlFor="inicial"
-							className="block mb-3 text-sm"
-							style={{ color: errors.initialAport ? "red" : "black" }}>
+							className={`block mt-5 mb-3 text-sm ${
+								errors.rentability ? "text-[#F00]" : "text-black"
+							}`}>
 							Aporte Inicial
 						</label>
 						<input
@@ -116,25 +125,20 @@ export default function Simulador(props: { setResultData: any }) {
 								errors.initialAport ? "border-red-500" : null
 							} border-black bg-transparent outline-none`}
 							id="inicial"
-							// name="1"
 							{...register("initialAport")}
 						/>
 
 						{errors.initialAport && (
-							<div
-								style={{
-									color: "red",
-									fontSize: "11px",
-									marginTop: "5px",
-								}}>
+							<div className="text-[#F00] text-[11px] mt-[5px]">
 								Aporte inicial deve ser um número
 							</div>
 						)}
 
 						<label
 							htmlFor="prazo"
-							className="block mt-5 mb-3 text-sm"
-							style={{ color: errors.deadline ? "red" : "black" }}>
+							className={`block mt-5 mb-3 text-sm ${
+								errors.rentability ? "text-[#F00]" : "text-black"
+							}`}>
 							Prazo (em meses)
 						</label>
 						<input
@@ -147,12 +151,7 @@ export default function Simulador(props: { setResultData: any }) {
 						/>
 
 						{errors.deadline && (
-							<div
-								style={{
-									color: "red",
-									fontSize: "11px",
-									marginTop: "5px",
-								}}>
+							<div className="text-[#F00] text-[11px] mt-[5px]">
 								Prazo deve ser um número
 							</div>
 						)}
@@ -175,18 +174,20 @@ export default function Simulador(props: { setResultData: any }) {
 									type="radio"
 									id="pre"
 									className="hidden peer"
-									// name="2"
 									value="pre"
 									defaultChecked
 									{...register("indexationTypes")}
+									onClick={() => setIndexacao("pre")}
 								/>
 								<label
 									htmlFor="pre"
-									className="peer-checked:bg-[#ED8E53] peer-checked:text-white w-full h-full cursor-pointer px-[5px] py-4 border-black border-r-[1px] flex text-sm">
+									className="peer-checked:bg-[#ED8E53] peer-checked:text-white w-full h-full cursor-pointer px-[5px] py-4 border-black border-r-[1px] flex text-sm hover:bg-[#eecdb9]">
 									<img
 										src="/check.svg"
 										alt="check icon"
-										className="w-5 -ml-1 hidden sm:block"
+										className={`w-5 ${
+											indexacao === "pre" ? "block" : "hidden"
+										}`}
 									/>
 									PRÉ
 								</label>
@@ -196,17 +197,19 @@ export default function Simulador(props: { setResultData: any }) {
 									type="radio"
 									id="pos"
 									className="hidden peer"
-									// name="2"
 									value="pos"
 									{...register("indexationTypes")}
+									onClick={() => setIndexacao("pos")}
 								/>
 								<label
 									htmlFor="pos"
-									className="peer-checked:bg-[#ED8E53] peer-checked:text-white cursor-pointer px-[5px] py-4 flex border-black border-r-[1px] text-sm">
+									className="peer-checked:bg-[#ED8E53] peer-checked:text-white cursor-pointer px-[5px] py-4 flex border-black border-r-[1px] text-sm hover:bg-[#eecdb9]">
 									<img
 										src="/check.svg"
 										alt="check icon"
-										className="w-5 -ml-1 hidden sm:block"
+										className={`w-5 ${
+											indexacao === "pos" ? "block" : "hidden"
+										}`}
 									/>
 									PÓS
 								</label>
@@ -216,17 +219,19 @@ export default function Simulador(props: { setResultData: any }) {
 									type="radio"
 									id="fixado"
 									className="hidden peer"
-									// name="2"
 									value="ipca"
 									{...register("indexationTypes")}
+									onClick={() => setIndexacao("ipca")}
 								/>
 								<label
 									htmlFor="fixado"
-									className="peer-checked:bg-[#ED8E53] peer-checked:text-white cursor-pointer px-[5px] py-4 flex text-sm">
+									className="peer-checked:bg-[#ED8E53] peer-checked:text-white cursor-pointer px-[5px] py-4 flex text-sm hover:bg-[#eecdb9]">
 									<img
 										src="/check.svg"
 										alt="check icon"
-										className="w-5 -ml-1 hidden sm:block"
+										className={`w-5 ${
+											indexacao === "ipca" ? "block" : "hidden"
+										}`}
 									/>
 									FIXADO
 								</label>
@@ -235,8 +240,9 @@ export default function Simulador(props: { setResultData: any }) {
 
 						<label
 							htmlFor="inicial"
-							className="block mb-3 text-sm"
-							style={{ color: errors.mensalAport ? "red" : "black" }}>
+							className={`block mt-5 mb-3 text-sm ${
+								errors.rentability ? "text-[#F00]" : "text-black"
+							}`}>
 							Aporte Mensal
 						</label>
 						<input
@@ -245,25 +251,20 @@ export default function Simulador(props: { setResultData: any }) {
 								errors.mensalAport ? "border-red-500" : null
 							} border-black bg-transparent outline-none`}
 							id="inicial"
-							// name="1"
 							{...register("mensalAport")}
 						/>
 
 						{errors.mensalAport && (
-							<div
-								style={{
-									color: "red",
-									fontSize: "11px",
-									marginTop: "5px",
-								}}>
+							<div className="text-[#F00] text-[11px] mt-[5px]">
 								Aporte mensal deve ser um número
 							</div>
 						)}
 
 						<label
 							htmlFor="prazo"
-							className="block mt-5 mb-3 text-sm"
-							style={{ color: errors.rentability ? "red" : "black" }}>
+							className={`block mt-5 mb-3 text-sm ${
+								errors.rentability ? "text-[#F00]" : "text-black"
+							}`}>
 							Rentabilidade
 						</label>
 						<input
@@ -276,12 +277,7 @@ export default function Simulador(props: { setResultData: any }) {
 						/>
 
 						{errors.rentability && (
-							<div
-								style={{
-									color: "red",
-									fontSize: "11px",
-									marginTop: "5px",
-								}}>
+							<div className="text-[#F00] text-[11px] mt-[5px]">
 								Rentabilidade deve ser um número
 							</div>
 						)}
@@ -299,12 +295,11 @@ export default function Simulador(props: { setResultData: any }) {
 				</div>
 				<div className="flex gap-8">
 					<div
-						className="border border-black rounded-lg py-3 w-full font-bold cursor-pointer text-center"
+						className="border border-black rounded-lg py-3 w-full hover:bg-[#eecdb9] font-bold cursor-pointer text-center"
 						onClick={() => resetFields()}>
 						Limpar campos
 					</div>
 					<button
-						// disabled
 						type="submit"
 						className="rounded-lg py-3 w-full bg-gray-400 hover:bg-[#ED8E53] font-bold">
 						Simular
